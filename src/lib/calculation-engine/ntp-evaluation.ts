@@ -40,11 +40,12 @@ export interface NtpEvaluationResult {
 }
 
 function compositeRating(item: DeliverableInput): number {
-  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating].filter(
-    (r) => r > 0
-  );
+  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating]
+    .map((r) => Math.min(5, Math.max(0, r)))
+    .filter((r) => !Number.isNaN(r));
   if (ratings.length === 0) return 0;
-  return ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  return Math.min(5, avg);
 }
 
 function avgDeliverables(items: DeliverableInput[]): { rating: D; trace: ComputationStep[] } {
@@ -76,8 +77,8 @@ export function computeBaseIpcrNtp(
     if (weight <= 0) continue;
     const rating =
       category === "PASSENGER_FEEDBACK"
-        ? passengerFeedbackRating ?? 0
-        : functionRatings[category] ?? 0;
+        ? Math.min(5, Math.max(0, passengerFeedbackRating ?? 0))
+        : Math.min(5, Math.max(0, functionRatings[category] ?? 0));
     const contrib = rating * weight;
     contributions.push({
       label: category.replace(/_/g, " "),

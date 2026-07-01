@@ -23,6 +23,11 @@ export function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+export function clampRating(value: number | undefined | null): number | undefined {
+  if (value == null || Number.isNaN(value)) return undefined;
+  return Math.min(5, Math.max(0, value));
+}
+
 export function createDefaultProfile(): EvaluationProfile {
   const defaultOffice = OFFICES[0];
   const dept = getDepartmentMeta(defaultOffice.department);
@@ -69,7 +74,7 @@ export function hasDeliverableRatingInput(item: {
   timelinessRating?: number;
 }): boolean {
   return [item.qualityRating, item.efficiencyRating, item.timelinessRating].some(
-    (r) => r != null && r > 0
+    (r) => r != null && !Number.isNaN(r) && r >= 0
   );
 }
 
@@ -78,11 +83,12 @@ export function computeDeliverableComposite(item: {
   efficiencyRating?: number;
   timelinessRating?: number;
 }): number | null {
-  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating].filter(
-    (r): r is number => r != null && r > 0
-  );
+  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating]
+    .map((r) => clampRating(r))
+    .filter((r): r is number => r != null);
   if (ratings.length === 0) return null;
-  return ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  return clampRating(avg) ?? null;
 }
 
 export function computeDeliverablesSectionRating(
@@ -90,9 +96,10 @@ export function computeDeliverablesSectionRating(
 ): number | null {
   const composites = items
     .map(computeDeliverableComposite)
-    .filter((r): r is number => r != null && r > 0);
+    .filter((r): r is number => r != null);
   if (composites.length === 0) return null;
-  return composites.reduce((a, b) => a + b, 0) / composites.length;
+  const avg = composites.reduce((a, b) => a + b, 0) / composites.length;
+  return clampRating(avg) ?? null;
 }
 
 export function getDeliverablesForCategory(
@@ -120,7 +127,7 @@ export function buildComputeInput(state: EvaluationState) {
 
   for (const category of categories) {
     const rating = computeFunctionCategoryRating(state, category);
-    if (rating != null && rating > 0) functionRatings[category] = rating;
+    if (rating != null) functionRatings[category] = rating;
   }
 
   const weights: Record<string, number> = {};
@@ -133,16 +140,16 @@ export function buildComputeInput(state: EvaluationState) {
     functionWeights: weights,
     functionRatings,
     passengerFeedbackRating: hasPassengerFeedback(profile.personnelCategory)
-      ? state.passengerFeedbackRating
+      ? clampRating(state.passengerFeedbackRating)
       : undefined,
     hasDesignation: profile.hasDesignation,
     officeOrderVerified: profile.officeOrderVerified,
     designationDeliverables: state.designationDeliverables
       .filter(hasDeliverableRatingInput)
       .map((dd) => ({
-        qualityRating: dd.qualityRating ?? 0,
-        efficiencyRating: dd.efficiencyRating ?? 0,
-        timelinessRating: dd.timelinessRating ?? 0,
+        qualityRating: clampRating(dd.qualityRating) ?? 0,
+        efficiencyRating: clampRating(dd.efficiencyRating) ?? 0,
+        timelinessRating: clampRating(dd.timelinessRating) ?? 0,
       })),
   };
 }
@@ -170,7 +177,7 @@ export function getRatingProgress(state: EvaluationState) {
   });
 
   if (hasPassengerFeedback(state.profile.personnelCategory)) {
-    const hasFeedback = (state.passengerFeedbackRating ?? 0) > 0;
+    const hasFeedback = state.passengerFeedbackRating != null;
     if (hasFeedback) completed++;
     sectionProgress.push({
       code: "PASSENGER_FEEDBACK",

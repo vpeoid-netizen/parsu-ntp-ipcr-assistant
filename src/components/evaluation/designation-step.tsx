@@ -3,44 +3,13 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IndicatorRatingBar } from "@/components/evaluation/rating-bar";
+import { RatingFieldsGrid, RatingSelect } from "@/components/evaluation/rating-select";
 import { useEvaluation } from "@/components/evaluation/evaluation-context";
 import { computeDeliverableComposite, computeDesignationLive, uid } from "@/lib/evaluation-client";
 import { formatRating } from "@/lib/utils";
 import type { DesignationDeliverableState } from "@/lib/types";
-
-function RatingFields({
-  item,
-  onChange,
-}: {
-  item: DesignationDeliverableState;
-  onChange: (patch: Partial<DesignationDeliverableState>) => void;
-}) {
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {(["qualityRating", "efficiencyRating", "timelinessRating"] as const).map((field) => (
-        <div key={field}>
-          <Label className="text-xs capitalize">{field.replace("Rating", "")}</Label>
-          <Input
-            type="number"
-            min={1}
-            max={5}
-            step="any"
-            placeholder="1–5"
-            value={item[field] ?? ""}
-            onChange={(e) => {
-              const v = e.target.value.trim();
-              onChange({ [field]: v === "" ? undefined : parseFloat(v) });
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function PassengerFeedbackStep() {
   const { state, setState } = useEvaluation();
@@ -52,32 +21,19 @@ export function PassengerFeedbackStep() {
         <h3 className="font-semibold">Passenger&apos;s Feedback</h3>
         <p className="text-xs text-muted-foreground mt-1">
           Full-time university drivers are rated on passenger feedback at 20% of the base IPCR.
-          Enter the overall feedback rating (1–5).
+          Select the overall feedback rating (0–5).
         </p>
       </div>
 
-      <div>
-        <Label>Passenger Feedback Rating (1–5)</Label>
-        <Input
-          type="number"
-          min={1}
-          max={5}
-          step="any"
-          placeholder="1–5"
-          value={state.passengerFeedbackRating ?? ""}
-          onChange={(e) => {
-            const v = e.target.value.trim();
-            setState({
-              ...state,
-              passengerFeedbackRating: v === "" ? undefined : parseFloat(v),
-            });
-          }}
-        />
-      </div>
+      <RatingSelect
+        label="Passenger Feedback Rating"
+        value={state.passengerFeedbackRating}
+        onChange={(rating) => setState({ ...state, passengerFeedbackRating: rating })}
+      />
 
-      {(state.passengerFeedbackRating ?? 0) > 0 && (
+      {state.passengerFeedbackRating != null && (
         <IndicatorRatingBar
-          rating={state.passengerFeedbackRating!}
+          rating={state.passengerFeedbackRating}
           label="Passenger Feedback"
           compact
         />
@@ -161,7 +117,7 @@ export function DesignationStep() {
                 update(list.map((x) => (x.id === dd.id ? { ...x, actualOutput: e.target.value } : x)))
               }
             />
-            <RatingFields
+            <RatingFieldsGrid
               item={dd}
               onChange={(patch) =>
                 update(list.map((x) => (x.id === dd.id ? { ...x, ...patch } : x)))

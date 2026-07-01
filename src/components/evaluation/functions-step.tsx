@@ -3,10 +3,9 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IndicatorRatingBar } from "@/components/evaluation/rating-bar";
+import { RatingFieldsGrid } from "@/components/evaluation/rating-select";
 import { useEvaluation } from "@/components/evaluation/evaluation-context";
 import { FUNCTION_CATEGORY_LABELS } from "@/data/reference";
 import {
@@ -17,44 +16,6 @@ import {
 } from "@/lib/evaluation-client";
 import { formatRating } from "@/lib/utils";
 import type { FunctionCategory, FunctionDeliverableState } from "@/lib/types";
-
-function RatingFields({
-  item,
-  onChange,
-}: {
-  item: {
-    qualityRating?: number;
-    efficiencyRating?: number;
-    timelinessRating?: number;
-  };
-  onChange: (patch: {
-    qualityRating?: number;
-    efficiencyRating?: number;
-    timelinessRating?: number;
-  }) => void;
-}) {
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {(["qualityRating", "efficiencyRating", "timelinessRating"] as const).map((field) => (
-        <div key={field}>
-          <Label className="text-xs capitalize">{field.replace("Rating", "")}</Label>
-          <Input
-            type="number"
-            min={1}
-            max={5}
-            step="any"
-            placeholder="1–5"
-            value={item[field] ?? ""}
-            onChange={(e) => {
-              const v = e.target.value.trim();
-              onChange({ [field]: v === "" ? undefined : parseFloat(v) });
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function FunctionsStep({ category }: { category: FunctionCategory }) {
   const { state, setState } = useEvaluation();
@@ -79,7 +40,7 @@ export function FunctionsStep({ category }: { category: FunctionCategory }) {
       <div className="rounded-lg border bg-primary/5 p-4">
         <h3 className="font-semibold">{FUNCTION_CATEGORY_LABELS[category]}</h3>
         <p className="text-xs text-muted-foreground mt-1">
-          Rate each deliverable using Quality, Efficiency, and Timeliness (1–5) per the FY 2026
+          Rate each deliverable using Quality, Efficiency, and Timeliness (0–5) per the FY 2026
           Non-Teaching IPCR Guidelines.
           {weightLabel && (
             <span className="block mt-1 font-medium text-primary">
@@ -140,7 +101,7 @@ export function FunctionsStep({ category }: { category: FunctionCategory }) {
                 )
               }
             />
-            <RatingFields
+            <RatingFieldsGrid
               item={item}
               onChange={(patch) =>
                 update(list.map((x) => (x.id === item.id ? { ...x, ...patch } : x)))
