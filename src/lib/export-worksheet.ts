@@ -95,7 +95,7 @@ export function buildWorksheetData(
   );
 
   return {
-    title: "ParSU NTP IPCR Evaluation Worksheet",
+    title: "ParSU Non-Teaching Personnel IPCR Evaluation Worksheet",
     subtitle: `${RULESET_VERSION} — ${profile.employeeName || "Unnamed Employee"}`,
     personnelRows,
     deliverables,
@@ -110,5 +110,5 @@ export function buildWorksheetData(
 export function buildExportFilename(state: EvaluationState): string {
   const name = state.profile.employeeName.trim().replace(/\s+/g, "_") || "employee";
   const period = state.profile.ratingPeriod.replace(/[–\s]/g, "_");
-  return `ParSU_NTP_IPCR_${name}_${state.profile.evaluationYear}_${period}.pdf`;
+  return `ParSU_Non_Teaching_Personnel_IPCR_${name}_${state.profile.evaluationYear}_${period}.pdf`;
 }

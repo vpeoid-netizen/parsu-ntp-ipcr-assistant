@@ -25,7 +25,7 @@ export function ExportStep() {
           <div>
             <h3 className="font-semibold">Export evaluation worksheet</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Download a PDF or print the full NTP IPCR rating worksheet below.
+              Download a PDF or print the full Non-Teaching Personnel IPCR rating worksheet below.
             </p>
           </div>
         </div>

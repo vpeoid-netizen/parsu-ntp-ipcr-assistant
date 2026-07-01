@@ -8,7 +8,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <ParsuLogo size={36} className="h-9 w-9 object-contain" />
           <div>
             <p className="text-sm font-bold text-primary leading-tight">
-              ParSU NTP IPCR Evaluation Assistant
+              ParSU Non-Teaching Personnel IPCR Evaluation Assistant
             </p>
             <p className="text-[10px] text-muted-foreground leading-tight">
               FY 2026 Non-Teaching Personnel Rating Computation

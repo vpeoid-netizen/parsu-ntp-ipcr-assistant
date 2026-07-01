@@ -59,7 +59,7 @@ export function EvaluationWorkspace() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <p className="text-xs text-primary font-semibold uppercase tracking-wide">
-            FY 2026 NTP IPCR Evaluation
+            FY 2026 Non-Teaching Personnel IPCR Evaluation
           </p>
           <h2 className="text-xl font-bold">{currentLabel}</h2>
         </div>

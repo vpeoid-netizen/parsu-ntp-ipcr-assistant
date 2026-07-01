@@ -12,7 +12,9 @@ export function WelcomeScreen() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <div className="text-center mb-10">
         <ParsuLogo size={80} className="h-20 w-20 object-contain mx-auto mb-4" />
-        <h1 className="text-3xl font-bold text-parsu-dark">ParSU NTP IPCR Evaluation Assistant</h1>
+        <h1 className="text-3xl font-bold text-parsu-dark">
+          ParSU Non-Teaching Personnel IPCR Evaluation Assistant
+        </h1>
         <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
           FY 2026 rating computation tool for non-teaching personnel. Enter function deliverable
           ratings and personnel information to compute your IPCR — no account required. Data is kept
