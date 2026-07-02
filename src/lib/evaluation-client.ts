@@ -207,13 +207,21 @@ export function loadSession(): EvaluationState | null {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
-    const state = JSON.parse(raw) as EvaluationState;
+    const state = JSON.parse(raw) as EvaluationState & {
+      profile?: EvaluationProfile & {
+        officeOrderNo?: string;
+        officeOrderDate?: string;
+        officeOrderVerified?: boolean;
+      };
+    };
     const rawAppointment = state.profile.appointmentType as string;
     const appointmentType =
       rawAppointment === "TEMPORARY" ? ("CASUAL" as const) : state.profile.appointmentType;
+    const { officeOrderNo: _no, officeOrderDate: _date, officeOrderVerified: _verified, ...profile } =
+      state.profile;
     return {
       ...state,
-      profile: { ...state.profile, appointmentType },
+      profile: { ...profile, appointmentType },
     };
   } catch {
     return null;
