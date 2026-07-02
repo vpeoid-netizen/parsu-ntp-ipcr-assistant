@@ -61,6 +61,14 @@ export function SummaryStep() {
         ))}
       </div>
 
+      {state.profile.hasDesignation && (
+        <p className="text-sm text-primary bg-primary/5 border border-primary/20 rounded-lg p-3">
+          Final IPCR = Base IPCR ({formatRating(computation.baseIpcr.rating)} × 70%) + Designation
+          rating ({formatRating(computation.designationRating.rating)} × 30%) ={" "}
+          {formatRating(computation.finalIpcr.rating)}
+        </p>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 text-sm">
         {[
           ["Base IPCR", computation.baseIpcr.rating],

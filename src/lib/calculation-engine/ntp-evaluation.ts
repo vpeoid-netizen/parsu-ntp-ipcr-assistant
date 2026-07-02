@@ -22,7 +22,6 @@ export interface NtpEvaluationInput {
   functionRatings: Record<string, number>;
   passengerFeedbackRating?: number;
   hasDesignation: boolean;
-  officeOrderVerified: boolean;
   designationDeliverables: DeliverableInput[];
 }
 
@@ -104,16 +103,15 @@ export function computeBaseIpcrNtp(
 export function computeFinalIpcrNtp(
   baseIpcr: number,
   designationRating: number,
-  hasDesignation: boolean,
-  officeOrderVerified: boolean
+  hasDesignation: boolean
 ): { rating: D; trace: ComputationStep[] } {
   const steps: ComputationStep[] = [];
   const base = d(baseIpcr);
-  const designation = d(designationRating);
+  const designation = d(Math.min(5, Math.max(0, designationRating)));
 
-  if (!hasDesignation || !officeOrderVerified || designation.lte(0)) {
+  if (!hasDesignation) {
     steps.push({
-      label: "No verified designation weighting applied",
+      label: "Final IPCR (no designation)",
       value: round(base).toFixed(3),
     });
     return { rating: cap(base), trace: steps };
@@ -163,8 +161,7 @@ export function computeNtpEvaluation(input: NtpEvaluationInput): NtpEvaluationRe
   const finalResult = computeFinalIpcrNtp(
     round(baseResult.rating).toNumber(),
     round(desigResult.rating).toNumber(),
-    input.hasDesignation,
-    input.officeOrderVerified
+    input.hasDesignation
   );
 
   return {

@@ -49,12 +49,8 @@ export function buildWorksheetData(
     personnelRows.push(["Immediate Supervisor", profile.supervisorName]);
   }
 
-  if (profile.hasDesignation) {
-    personnelRows.push(
-      ["Designation", profile.designationTitle || "—"],
-      ["Office Order No.", profile.officeOrderNo || "—"],
-      ["Office Order Verified", profile.officeOrderVerified ? "Yes" : "No"]
-    );
+  if (profile.hasDesignation && profile.designationTitle) {
+    personnelRows.push(["Designation", profile.designationTitle]);
   }
 
   const deliverables: WorksheetDeliverableRow[] = state.functionDeliverables

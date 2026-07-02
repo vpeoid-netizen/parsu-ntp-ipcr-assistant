@@ -43,7 +43,6 @@ export function createDefaultProfile(): EvaluationProfile {
     evaluationYear: 2026,
     ratingPeriod: "January–June",
     hasDesignation: false,
-    officeOrderVerified: false,
   };
 }
 
@@ -143,7 +142,6 @@ export function buildComputeInput(state: EvaluationState) {
       ? clampRating(state.passengerFeedbackRating)
       : undefined,
     hasDesignation: profile.hasDesignation,
-    officeOrderVerified: profile.officeOrderVerified,
     designationDeliverables: state.designationDeliverables
       .filter(hasDeliverableRatingInput)
       .map((dd) => ({

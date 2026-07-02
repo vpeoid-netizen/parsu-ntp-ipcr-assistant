@@ -50,9 +50,6 @@ export interface EvaluationProfile {
   supervisorName?: string;
   hasDesignation: boolean;
   designationTitle?: string;
-  officeOrderNo?: string;
-  officeOrderDate?: string;
-  officeOrderVerified: boolean;
 }
 
 export interface EvaluationState {

@@ -195,38 +195,13 @@ export function ProfileStep() {
         </div>
 
         {p.hasDesignation && (
-          <>
-            <div className="sm:col-span-2">
-              <Label>Official Designation Title</Label>
-              <Input
-                value={p.designationTitle ?? ""}
-                onChange={(e) => updateProfile({ designationTitle: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Office Order No.</Label>
-              <Input
-                value={p.officeOrderNo ?? ""}
-                onChange={(e) => updateProfile({ officeOrderNo: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Office Order Date</Label>
-              <Input
-                type="date"
-                value={p.officeOrderDate ?? ""}
-                onChange={(e) => updateProfile({ officeOrderDate: e.target.value })}
-              />
-            </div>
-            <label className="flex items-center gap-2 text-sm sm:col-span-2">
-              <input
-                type="checkbox"
-                checked={p.officeOrderVerified}
-                onChange={(e) => updateProfile({ officeOrderVerified: e.target.checked })}
-              />
-              Office Order verified (required for 70/30 designation weighting)
-            </label>
-          </>
+          <div className="sm:col-span-2">
+            <Label>Official Designation Title</Label>
+            <Input
+              value={p.designationTitle ?? ""}
+              onChange={(e) => updateProfile({ designationTitle: e.target.value })}
+            />
+          </div>
         )}
       </div>
 

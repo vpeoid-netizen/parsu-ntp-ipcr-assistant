@@ -31,9 +31,9 @@ export function SummaryPanel() {
         <CardTitle className="text-sm">Live Rating Summary</CardTitle>
       </CardHeader>
       <CardContent className="text-xs space-y-4">
-        {state.profile.hasDesignation && state.profile.officeOrderVerified && (
+        {state.profile.hasDesignation && (
           <p className="text-primary bg-primary/5 border border-primary/20 rounded-lg p-2 text-xs">
-            Designation active: Final IPCR = Base (70%) + Designation (30%).
+            Designation active: Final IPCR = Base IPCR (70%) + Designation rating (30%).
           </p>
         )}
         <div className="flex justify-between">

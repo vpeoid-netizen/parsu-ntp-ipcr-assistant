@@ -69,7 +69,7 @@ export function DesignationStep() {
         <h3 className="font-semibold">Designation Rating</h3>
         <p className="text-xs text-muted-foreground mt-1">
           Non-teaching personnel with designations: Final IPCR = Base IPCR (70%) + Designation
-          rating (30%). Office Order must be verified.
+          rating (30%).
         </p>
       </div>
 
