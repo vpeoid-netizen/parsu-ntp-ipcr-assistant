@@ -2,10 +2,13 @@
 
 import { useEvaluation } from "@/components/evaluation/evaluation-context";
 import { IndicatorRatingBar } from "@/components/evaluation/rating-bar";
-import { profileIsComplete } from "@/lib/evaluation-client";
-import { FUNCTION_CATEGORY_LABELS, FUNCTION_WEIGHTS } from "@/data/reference";
+import {
+  computeDeliverableComposite,
+  getDesignationRating,
+  profileIsComplete,
+} from "@/lib/evaluation-client";
+import { FUNCTION_CATEGORY_LABELS, FUNCTION_WEIGHTS, RULESET_VERSION } from "@/data/reference";
 import { formatRating } from "@/lib/utils";
-import { RULESET_VERSION } from "@/data/reference";
 
 export function SummaryStep() {
   const { state, computation } = useEvaluation();
@@ -13,6 +16,7 @@ export function SummaryStep() {
 
   const profileComplete = profileIsComplete(state.profile);
   const ipcrRating = computation.finalIpcr.rating;
+  const designationRating = getDesignationRating(state, computation);
   const weights = FUNCTION_WEIGHTS[state.profile.personnelCategory];
 
   const functionRows = Object.entries(weights)
@@ -28,6 +32,13 @@ export function SummaryStep() {
         rating,
       };
     });
+
+  const designationRows = state.designationDeliverables
+    .filter((d) => d.deliverable.trim() || computeDeliverableComposite(d) != null)
+    .map((d) => ({
+      deliverable: d.deliverable || "—",
+      rating: computeDeliverableComposite(d),
+    }));
 
   return (
     <div className="space-y-6">
@@ -59,13 +70,46 @@ export function SummaryStep() {
             <span className="font-mono font-semibold">{formatRating(row.rating)}</span>
           </div>
         ))}
+        <div className="flex justify-between border-b py-2 text-sm font-medium">
+          <span>Base IPCR</span>
+          <span className="font-mono">{formatRating(computation.baseIpcr.rating)}</span>
+        </div>
       </div>
+
+      {state.profile.hasDesignation && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">Designation Rating (30%)</h4>
+          {state.profile.designationTitle && (
+            <p className="text-xs text-muted-foreground">
+              Designation: {state.profile.designationTitle}
+            </p>
+          )}
+          {designationRows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No designation deliverables entered yet.</p>
+          ) : (
+            designationRows.map((row) => (
+              <div
+                key={`${row.deliverable}-${row.rating}`}
+                className="flex justify-between border-b py-2 text-sm"
+              >
+                <span className="pr-4">{row.deliverable}</span>
+                <span className="font-mono font-semibold shrink-0">
+                  {formatRating(row.rating)}
+                </span>
+              </div>
+            ))
+          )}
+          <div className="flex justify-between border-b py-2 text-sm font-medium">
+            <span>Designation Rating</span>
+            <span className="font-mono">{formatRating(designationRating)}</span>
+          </div>
+        </div>
+      )}
 
       {state.profile.hasDesignation && (
         <p className="text-sm text-primary bg-primary/5 border border-primary/20 rounded-lg p-3">
           Final IPCR = Base IPCR ({formatRating(computation.baseIpcr.rating)} × 70%) + Designation
-          rating ({formatRating(computation.designationRating.rating)} × 30%) ={" "}
-          {formatRating(computation.finalIpcr.rating)}
+          rating ({formatRating(designationRating)} × 30%) = {formatRating(computation.finalIpcr.rating)}
         </p>
       )}
 
@@ -73,7 +117,11 @@ export function SummaryStep() {
         {[
           ["Base IPCR", computation.baseIpcr.rating],
           ...(state.profile.hasDesignation
-            ? [["Designation", computation.designationRating.rating]]
+            ? [
+                ["Designation Rating", designationRating],
+                ["Base IPCR weighted (70%)", computation.baseIpcr.rating * 0.7],
+                ["Designation weighted (30%)", designationRating * 0.3],
+              ]
             : []),
           ["Final IPCR", computation.finalIpcr.rating],
         ].map(([label, val]) => (

@@ -92,6 +92,32 @@ export function ExportStep() {
           </div>
         </section>
 
+        {worksheet.designationDeliverables.length > 0 && (
+          <section>
+            <h4 className="section-header rounded-b-none">Designation Deliverables (30%)</h4>
+            <div className="border border-t-0 rounded-b-lg overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left p-2 font-medium">Category</th>
+                    <th className="text-left p-2 font-medium">Deliverable</th>
+                    <th className="text-right p-2 font-medium w-28">Rating</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {worksheet.designationDeliverables.map((row) => (
+                    <tr key={`${row.category}-${row.deliverable}`}>
+                      <td className="p-2 text-muted-foreground">{row.category}</td>
+                      <td className="p-2">{row.deliverable}</td>
+                      <td className="p-2 text-right font-mono">{row.rating}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
         <section>
           <h4 className="section-header rounded-b-none">Rating Summary</h4>
           <div className="border border-t-0 rounded-b-lg divide-y text-sm">

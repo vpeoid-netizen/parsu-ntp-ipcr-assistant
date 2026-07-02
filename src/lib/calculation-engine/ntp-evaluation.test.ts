@@ -62,7 +62,7 @@ describe("computeNtpEvaluation", () => {
     expect(result.finalIpcr.rating).toBeCloseTo(4 * 0.7 + 4 * 0.3, 3);
   });
 
-  it("respects dimension applicability for designation deliverables", () => {
+  it("does not treat unset applicable dimensions as zero in designation rating", () => {
     const result = computeNtpEvaluation({
       personnelCategory: "ADMIN_STAFF",
       functionWeights: { CORE: 1 },
@@ -70,17 +70,17 @@ describe("computeNtpEvaluation", () => {
       hasDesignation: true,
       designationDeliverables: [
         {
-          qualityRating: 5,
-          efficiencyRating: 1,
-          timelinessRating: 1,
+          qualityRating: undefined,
+          efficiencyRating: 4,
+          timelinessRating: undefined,
           qualityApplicable: true,
-          efficiencyApplicable: false,
+          efficiencyApplicable: true,
           timelinessApplicable: false,
         },
       ],
     });
 
-    expect(result.designationRating.rating).toBeCloseTo(5, 3);
-    expect(result.finalIpcr.rating).toBeCloseTo(4 * 0.7 + 5 * 0.3, 3);
+    expect(result.designationRating.rating).toBeCloseTo(4, 3);
+    expect(result.finalIpcr.rating).toBeCloseTo(4 * 0.7 + 4 * 0.3, 3);
   });
 });

@@ -15,9 +15,9 @@ import {
 } from "./decimal";
 
 export interface DeliverableInput extends DeliverableRatingsFields {
-  qualityRating: number;
-  efficiencyRating: number;
-  timelinessRating: number;
+  qualityRating?: number;
+  efficiencyRating?: number;
+  timelinessRating?: number;
 }
 
 export interface NtpEvaluationInput {

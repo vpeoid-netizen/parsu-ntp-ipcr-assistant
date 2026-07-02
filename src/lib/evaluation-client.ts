@@ -95,7 +95,13 @@ export function computeFunctionCategoryRating(
 }
 
 export function computeDesignationLive(state: EvaluationState): number | null {
+  if (!state.profile.hasDesignation) return null;
   return computeDeliverablesSectionRating(state.designationDeliverables);
+}
+
+export function getDesignationRating(state: EvaluationState, computation: NtpEvaluationResult): number {
+  if (!state.profile.hasDesignation) return 0;
+  return computation.designationRating.rating;
 }
 
 export function buildComputeInput(state: EvaluationState) {
@@ -124,9 +130,9 @@ export function buildComputeInput(state: EvaluationState) {
     designationDeliverables: state.designationDeliverables
       .filter(hasDeliverableRatingInput)
       .map((dd) => ({
-        qualityRating: clampRating(dd.qualityRating) ?? 0,
-        efficiencyRating: clampRating(dd.efficiencyRating) ?? 0,
-        timelinessRating: clampRating(dd.timelinessRating) ?? 0,
+        qualityRating: dd.qualityRating,
+        efficiencyRating: dd.efficiencyRating,
+        timelinessRating: dd.timelinessRating,
         qualityApplicable: dd.qualityApplicable,
         efficiencyApplicable: dd.efficiencyApplicable,
         timelinessApplicable: dd.timelinessApplicable,
@@ -141,7 +147,14 @@ export function computeLiveEvaluation(state: EvaluationState): NtpEvaluationResu
 export function getRatingProgress(state: EvaluationState) {
   const categories = getApplicableFunctionCategories(state.profile.personnelCategory);
   let completed = 0;
-  const sectionProgress = categories.map((category) => {
+  const sectionProgress: {
+    code: string;
+    label: string;
+    completed: number;
+    total: number;
+    percent: number;
+    rating: number;
+  }[] = categories.map((category) => {
     const deliverables = getDeliverablesForCategory(state, category);
     const rated = deliverables.filter(hasDeliverableRatingInput).length;
     const total = deliverables.length;
@@ -166,6 +179,22 @@ export function getRatingProgress(state: EvaluationState) {
       total: 1,
       percent: hasFeedback ? 100 : 0,
       rating: state.passengerFeedbackRating ?? 0,
+    });
+  }
+
+  if (state.profile.hasDesignation) {
+    const deliverables = state.designationDeliverables;
+    const rated = deliverables.filter(hasDeliverableRatingInput).length;
+    const total = deliverables.length;
+    const designationRating = computeDesignationLive(state) ?? 0;
+    if (total > 0 && rated > 0) completed++;
+    sectionProgress.push({
+      code: "DESIGNATION",
+      label: "Designation Rating",
+      completed: rated,
+      total: Math.max(total, 1),
+      percent: total > 0 ? Math.round((rated / total) * 100) : 0,
+      rating: designationRating,
     });
   }
 

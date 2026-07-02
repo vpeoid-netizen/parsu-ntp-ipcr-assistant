@@ -2,6 +2,7 @@ import type { NtpEvaluationResult } from "@/lib/calculation-engine/ntp-evaluatio
 import {
   computeDeliverableComposite,
   computeFunctionCategoryRating,
+  getDesignationRating,
 } from "@/lib/evaluation-client";
 import type { EvaluationState, FunctionCategory } from "@/lib/types";
 import {
@@ -22,6 +23,7 @@ export interface WorksheetData {
   subtitle: string;
   personnelRows: [string, string][];
   deliverables: WorksheetDeliverableRow[];
+  designationDeliverables: WorksheetDeliverableRow[];
   summaryRows: [string, string][];
   finalRating: string;
   adjectivalRating: string;
@@ -33,6 +35,7 @@ export function buildWorksheetData(
   computation: NtpEvaluationResult
 ): WorksheetData {
   const { profile } = state;
+  const designationRating = getDesignationRating(state, computation);
 
   const personnelRows: [string, string][] = [
     ["Employee", profile.employeeName || "—"],
@@ -61,7 +64,15 @@ export function buildWorksheetData(
       rating: formatRating(computeDeliverableComposite(d)),
     }));
 
-  if ((state.passengerFeedbackRating ?? 0) > 0) {
+  const designationDeliverables: WorksheetDeliverableRow[] = state.designationDeliverables
+    .filter((d) => d.deliverable.trim() || computeDeliverableComposite(d) != null)
+    .map((d) => ({
+      category: "Designation",
+      deliverable: d.deliverable || "—",
+      rating: formatRating(computeDeliverableComposite(d)),
+    }));
+
+  if ((state.passengerFeedbackRating ?? null) != null) {
     deliverables.push({
       category: FUNCTION_CATEGORY_LABELS.PASSENGER_FEEDBACK,
       deliverable: "Passenger Feedback",
@@ -81,11 +92,17 @@ export function buildWorksheetData(
       return [`${label} (${(weight! * 100).toFixed(0)}%)`, formatRating(rating)];
     });
 
+  summaryRows.push(["Base IPCR", formatRating(computation.baseIpcr.rating)]);
+
+  if (profile.hasDesignation) {
+    summaryRows.push(
+      ["Designation Rating (30%)", formatRating(designationRating)],
+      ["Base IPCR weighted (70%)", formatRating(computation.baseIpcr.rating * 0.7)],
+      ["Designation weighted (30%)", formatRating(designationRating * 0.3)]
+    );
+  }
+
   summaryRows.push(
-    ["Base IPCR", formatRating(computation.baseIpcr.rating)],
-    ...(profile.hasDesignation
-      ? [["Designation", formatRating(computation.designationRating.rating)] as [string, string]]
-      : []),
     ["Final IPCR", formatRating(computation.finalIpcr.rating)],
     ["Adjectival Rating", computation.adjectivalRating]
   );
@@ -95,6 +112,7 @@ export function buildWorksheetData(
     subtitle: `${RULESET_VERSION} — ${profile.employeeName || "Unnamed Employee"}`,
     personnelRows,
     deliverables,
+    designationDeliverables,
     summaryRows,
     finalRating: formatRating(computation.finalIpcr.rating),
     adjectivalRating: computation.adjectivalRating,

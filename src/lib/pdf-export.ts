@@ -429,6 +429,18 @@ class WorksheetPdfWriter {
       data.deliverables.map((r) => [r.category, r.deliverable, r.rating])
     );
 
+    if (data.designationDeliverables.length > 0) {
+      await this.drawSectionHeader("Designation Deliverables (30%)");
+      await this.drawTable(
+        [
+          { label: "Category", width: 0.22 },
+          { label: "Deliverable", width: 0.5 },
+          { label: "Rating", width: 0.28, align: "right" },
+        ],
+        data.designationDeliverables.map((r) => [r.category, r.deliverable, r.rating])
+      );
+    }
+
     await this.drawSectionHeader("Rating Summary");
     await this.drawSummaryPanel(data.summaryRows);
 

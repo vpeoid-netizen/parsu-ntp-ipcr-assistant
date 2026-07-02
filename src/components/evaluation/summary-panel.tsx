@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RatingHealthTracker } from "@/components/evaluation/rating-bar";
 import { useEvaluation } from "@/components/evaluation/evaluation-context";
-import { getRatingProgress, profileIsComplete } from "@/lib/evaluation-client";
+import { getDesignationRating, getRatingProgress, profileIsComplete } from "@/lib/evaluation-client";
 import { FUNCTION_CATEGORY_LABELS } from "@/data/reference";
 import { formatRating } from "@/lib/utils";
 
@@ -17,6 +17,9 @@ export function SummaryPanel() {
 
   const profileComplete = profileIsComplete(state.profile);
   const ipcrRating = computation.finalIpcr.rating;
+  const designationRating = getDesignationRating(state, computation);
+  const baseWeighted = computation.baseIpcr.rating * 0.7;
+  const designationWeighted = designationRating * 0.3;
 
   const sectionProgress = progress?.sectionProgress.map((section) => ({
     ...section,
@@ -60,12 +63,20 @@ export function SummaryPanel() {
             <span className="font-mono">{formatRating(computation.baseIpcr.rating)}</span>
           </div>
           {state.profile.hasDesignation && (
-            <div className="flex justify-between">
-              <span>Designation</span>
-              <span className="font-mono">
-                {formatRating(computation.designationRating.rating)}
-              </span>
-            </div>
+            <>
+              <div className="flex justify-between">
+                <span>Designation Rating</span>
+                <span className="font-mono">{formatRating(designationRating)}</span>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Base IPCR (70%)</span>
+                <span className="font-mono">{formatRating(baseWeighted)}</span>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Designation (30%)</span>
+                <span className="font-mono">{formatRating(designationWeighted)}</span>
+              </div>
+            </>
           )}
           <div className="flex justify-between font-semibold border-t pt-2 mt-2">
             <span>Final IPCR</span>
