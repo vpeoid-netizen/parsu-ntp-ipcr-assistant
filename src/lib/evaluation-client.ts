@@ -8,6 +8,13 @@ import {
   OFFICES,
 } from "@/data/reference";
 import { computeNtpEvaluation, type NtpEvaluationResult } from "@/lib/calculation-engine/ntp-evaluation";
+import {
+  clampRating,
+  computeDeliverableComposite,
+  defaultDeliverableRatings,
+  hasDeliverableRatingInput,
+  type DeliverableRatingsFields,
+} from "@/lib/deliverable-rating";
 import type {
   DesignationDeliverableState,
   EvaluationProfile,
@@ -23,10 +30,7 @@ export function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export function clampRating(value: number | undefined | null): number | undefined {
-  if (value == null || Number.isNaN(value)) return undefined;
-  return Math.min(5, Math.max(0, value));
-}
+export { clampRating, computeDeliverableComposite, defaultDeliverableRatings, hasDeliverableRatingInput };
 
 export function createDefaultProfile(): EvaluationProfile {
   const defaultOffice = OFFICES[0];
@@ -67,32 +71,7 @@ export function profileIsComplete(profile: EvaluationProfile): boolean {
   );
 }
 
-export function hasDeliverableRatingInput(item: {
-  qualityRating?: number;
-  efficiencyRating?: number;
-  timelinessRating?: number;
-}): boolean {
-  return [item.qualityRating, item.efficiencyRating, item.timelinessRating].some(
-    (r) => r != null && !Number.isNaN(r) && r >= 0
-  );
-}
-
-export function computeDeliverableComposite(item: {
-  qualityRating?: number;
-  efficiencyRating?: number;
-  timelinessRating?: number;
-}): number | null {
-  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating]
-    .map((r) => clampRating(r))
-    .filter((r): r is number => r != null);
-  if (ratings.length === 0) return null;
-  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  return clampRating(avg) ?? null;
-}
-
-export function computeDeliverablesSectionRating(
-  items: { qualityRating?: number; efficiencyRating?: number; timelinessRating?: number }[]
-): number | null {
+export function computeDeliverablesSectionRating(items: DeliverableRatingsFields[]): number | null {
   const composites = items
     .map(computeDeliverableComposite)
     .filter((r): r is number => r != null);
@@ -148,6 +127,9 @@ export function buildComputeInput(state: EvaluationState) {
         qualityRating: clampRating(dd.qualityRating) ?? 0,
         efficiencyRating: clampRating(dd.efficiencyRating) ?? 0,
         timelinessRating: clampRating(dd.timelinessRating) ?? 0,
+        qualityApplicable: dd.qualityApplicable,
+        efficiencyApplicable: dd.efficiencyApplicable,
+        timelinessApplicable: dd.timelinessApplicable,
       })),
   };
 }

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { IndicatorRatingBar } from "@/components/evaluation/rating-bar";
 import { RatingFieldsGrid, RatingSelect } from "@/components/evaluation/rating-select";
 import { useEvaluation } from "@/components/evaluation/evaluation-context";
-import { computeDeliverableComposite, computeDesignationLive, uid } from "@/lib/evaluation-client";
+import { computeDeliverableComposite, computeDesignationLive, defaultDeliverableRatings, uid } from "@/lib/evaluation-client";
 import { formatRating } from "@/lib/utils";
 import type { DesignationDeliverableState } from "@/lib/types";
 
@@ -126,7 +126,7 @@ export function DesignationStep() {
           </div>
         );
       })}
-      <Button variant="outline" onClick={() => update([...list, { id: uid(), deliverable: "" }])}>
+      <Button variant="outline" onClick={() => update([...list, { id: uid(), deliverable: "", ...defaultDeliverableRatings() }])}>
         <Plus className="h-4 w-4" /> Add deliverable
       </Button>
     </div>

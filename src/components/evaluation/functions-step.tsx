@@ -11,6 +11,7 @@ import { FUNCTION_CATEGORY_LABELS } from "@/data/reference";
 import {
   computeDeliverableComposite,
   computeFunctionCategoryRating,
+  defaultDeliverableRatings,
   getWeightLabel,
   uid,
 } from "@/lib/evaluation-client";
@@ -40,8 +41,8 @@ export function FunctionsStep({ category }: { category: FunctionCategory }) {
       <div className="rounded-lg border bg-primary/5 p-4">
         <h3 className="font-semibold">{FUNCTION_CATEGORY_LABELS[category]}</h3>
         <p className="text-xs text-muted-foreground mt-1">
-          Rate each deliverable using Quality, Efficiency, and Timeliness (0–5) per the FY 2026
-          Non-Teaching IPCR Guidelines.
+          Rate each deliverable using applicable Quality, Efficiency, and Timeliness ratings
+          (0–5). Toggle off dimensions that do not apply.
           {weightLabel && (
             <span className="block mt-1 font-medium text-primary">
               Weight allocation: {weightLabel} of base IPCR
@@ -83,7 +84,7 @@ export function FunctionsStep({ category }: { category: FunctionCategory }) {
               </Button>
             </div>
             {composite != null && (
-              <IndicatorRatingBar rating={composite} label="Composite (Q+E+T avg)" compact />
+              <IndicatorRatingBar rating={composite} label="Composite (applicable Q/E/T avg)" compact />
             )}
             <Textarea
               placeholder="Committed deliverable / target indicator"
@@ -114,7 +115,7 @@ export function FunctionsStep({ category }: { category: FunctionCategory }) {
       <Button
         variant="outline"
         onClick={() =>
-          update([...list, { id: uid(), functionCategory: category, deliverable: "" }])
+          update([...list, { id: uid(), functionCategory: category, deliverable: "", ...defaultDeliverableRatings() }])
         }
       >
         <Plus className="h-4 w-4" /> Add deliverable

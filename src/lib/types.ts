@@ -23,6 +23,9 @@ export interface FunctionDeliverableState {
   qualityRating?: number;
   efficiencyRating?: number;
   timelinessRating?: number;
+  qualityApplicable?: boolean;
+  efficiencyApplicable?: boolean;
+  timelinessApplicable?: boolean;
   evaluatorComments?: string;
 }
 
@@ -33,6 +36,9 @@ export interface DesignationDeliverableState {
   qualityRating?: number;
   efficiencyRating?: number;
   timelinessRating?: number;
+  qualityApplicable?: boolean;
+  efficiencyApplicable?: boolean;
+  timelinessApplicable?: boolean;
   evaluatorComments?: string;
 }
 

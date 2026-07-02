@@ -1,4 +1,8 @@
 import {
+  computeDeliverableComposite,
+  type DeliverableRatingsFields,
+} from "../deliverable-rating";
+import {
   avg,
   cap,
   createTrace,
@@ -10,7 +14,7 @@ import {
   type D,
 } from "./decimal";
 
-export interface DeliverableInput {
+export interface DeliverableInput extends DeliverableRatingsFields {
   qualityRating: number;
   efficiencyRating: number;
   timelinessRating: number;
@@ -39,12 +43,7 @@ export interface NtpEvaluationResult {
 }
 
 function compositeRating(item: DeliverableInput): number {
-  const ratings = [item.qualityRating, item.efficiencyRating, item.timelinessRating]
-    .map((r) => Math.min(5, Math.max(0, r)))
-    .filter((r) => !Number.isNaN(r));
-  if (ratings.length === 0) return 0;
-  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  return Math.min(5, avg);
+  return computeDeliverableComposite(item) ?? 0;
 }
 
 function avgDeliverables(items: DeliverableInput[]): { rating: D; trace: ComputationStep[] } {
